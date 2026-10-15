@@ -1,8 +1,9 @@
 import app from './app.js'
 import { env } from './config/env.js'
 
-const server = app.listen(env.port, () => {
-  console.log(`API listening on http://localhost:${env.port} [${env.nodeEnv}]`)
+// Localhost only: anyone else on the network could otherwise spend the API key
+const server = app.listen(env.port, '127.0.0.1', () => {
+  console.log(`API listening on http://127.0.0.1:${env.port} [${env.nodeEnv}]`)
 })
 
 // Let the platform stop us cleanly: finish in-flight requests, then exit.
