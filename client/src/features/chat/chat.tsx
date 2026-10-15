@@ -3,6 +3,7 @@ import { useChat } from './useChat'
 import { useMessageSettings } from './useMessageSettings'
 import { SettingsDrawer } from './settingsDrawer'
 import { ResponseDrawer } from './responseDrawer'
+import { CopyButton } from './copyButton'
 import { CodeBracketIcon, GearIcon } from './icons'
 import { ImagePickerButton, ImagePreviews } from './imagePicker'
 import { toDataUrl, type ImageInput } from './images'
@@ -40,109 +41,117 @@ export function Chat() {
         <SettingsDrawer {...messageSettings} onClose={() => setSettingsOpen(false)} />
       )}
 
-      <main className="mx-auto flex w-full max-w-3xl min-w-0 flex-1 flex-col p-4">
-        <header className="mb-4 flex items-center gap-3">
-          {!settingsOpen && (
+      <main className="flex min-w-0 flex-1 flex-col p-4">
+        {/* Fills the space between the drawers, but the chat column stops growing at max-w-4xl */}
+        <div className="mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col">
+          <header className="mb-4 flex items-center gap-3">
+            {!settingsOpen && (
+              <button
+                type="button"
+                onClick={() => setSettingsOpen(true)}
+                aria-label="Open settings"
+                className="rounded-md border border-gray-300 p-1.5 text-gray-700 hover:bg-gray-100"
+              >
+                <GearIcon className="size-5" />
+              </button>
+            )}
+            <h1 className="text-2xl font-semibold text-gray-900">Ask Claude</h1>
             <button
               type="button"
-              onClick={() => setSettingsOpen(true)}
-              aria-label="Open settings"
-              className="rounded-md border border-gray-300 p-1.5 text-gray-700 hover:bg-gray-100"
+              onClick={() => {
+                newChat()
+                setSelectedId(null)
+              }}
+              disabled={loading || entries.length === 0}
+              className="ml-auto rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <GearIcon className="size-5" />
+              New chat
             </button>
-          )}
-          <h1 className="text-2xl font-semibold text-gray-900">Ask Claude</h1>
-          <button
-            type="button"
-            onClick={() => {
-              newChat()
-              setSelectedId(null)
-            }}
-            disabled={loading || entries.length === 0}
-            className="ml-auto rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            New chat
-          </button>
-          {!responseOpen && (
-            <button
-              type="button"
-              onClick={() => setResponseOpen(true)}
-              aria-label="Open response"
-              className="rounded-md border border-gray-300 p-1.5 text-gray-700 hover:bg-gray-100"
-            >
-              <CodeBracketIcon className="size-5" />
-            </button>
-          )}
-        </header>
+            {!responseOpen && (
+              <button
+                type="button"
+                onClick={() => setResponseOpen(true)}
+                aria-label="Open response"
+                className="rounded-md border border-gray-300 p-1.5 text-gray-700 hover:bg-gray-100"
+              >
+                <CodeBracketIcon className="size-5" />
+              </button>
+            )}
+          </header>
 
-        <section className="flex-1 space-y-4 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4">
-          {entries.length === 0 && <p className="text-gray-500">Ask a question to get started.</p>}
-          {entries.map((entry) => (
-            <div key={entry.id} className="space-y-2">
-              {entry.images.length > 0 && (
-                <div className="ml-auto flex w-fit max-w-[80%] flex-wrap justify-end gap-2">
-                  {entry.images.map((image, i) => (
-                    <img
-                      key={i}
-                      src={toDataUrl(image)}
-                      alt=""
-                      className="max-h-40 rounded-lg border border-gray-200"
-                    />
-                  ))}
+          <section className="flex-1 space-y-4 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4">
+            {entries.length === 0 && (
+              <p className="text-gray-500">Ask a question to get started.</p>
+            )}
+            {entries.map((entry) => (
+              <div key={entry.id} className="space-y-2">
+                {entry.images.length > 0 && (
+                  <div className="ml-auto flex w-fit max-w-[80%] flex-wrap justify-end gap-2">
+                    {entry.images.map((image, i) => (
+                      <img
+                        key={i}
+                        src={toDataUrl(image)}
+                        alt=""
+                        className="max-h-40 rounded-lg border border-gray-200"
+                      />
+                    ))}
+                  </div>
+                )}
+                <div className="ml-auto w-fit max-w-[80%] rounded-lg bg-blue-600 px-4 py-2 text-white">
+                  {entry.question}
                 </div>
-              )}
-              <div className="ml-auto w-fit max-w-[80%] rounded-lg bg-blue-600 px-4 py-2 text-white">
-                {entry.question}
+                {entry.response ? (
+                  <div className="space-y-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedId(entry.id)
+                        setResponseOpen(true)
+                      }}
+                      title="Show raw response"
+                      className={`${answerClass} block text-left ${
+                        viewed?.id === entry.id
+                          ? 'ring-2 ring-blue-300'
+                          : 'hover:ring-2 hover:ring-gray-200'
+                      }`}
+                    >
+                      {entry.answer}
+                    </button>
+                    <CopyButton text={entry.answer ?? ''} />
+                  </div>
+                ) : (
+                  <div className={answerClass}>
+                    {entry.error ? (
+                      <span role="alert" className="text-red-600">
+                        {entry.error}
+                      </span>
+                    ) : (
+                      <span className="animate-pulse text-gray-400">Thinking…</span>
+                    )}
+                  </div>
+                )}
               </div>
-              {entry.response ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedId(entry.id)
-                    setResponseOpen(true)
-                  }}
-                  title="Show raw response"
-                  className={`${answerClass} block text-left ${
-                    viewed?.id === entry.id
-                      ? 'ring-2 ring-blue-300'
-                      : 'hover:ring-2 hover:ring-gray-200'
-                  }`}
-                >
-                  {entry.answer}
-                </button>
-              ) : (
-                <div className={answerClass}>
-                  {entry.error ? (
-                    <span role="alert" className="text-red-600">
-                      {entry.error}
-                    </span>
-                  ) : (
-                    <span className="animate-pulse text-gray-400">Thinking…</span>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-        </section>
+            ))}
+          </section>
 
-        <ImagePreviews images={images} onChange={setImages} />
-        <form onSubmit={handleSubmit} className="mt-2 flex gap-2">
-          <ImagePickerButton images={images} onChange={setImages} disabled={loading} />
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a question…"
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-          />
-          <button
-            type="submit"
-            disabled={loading || !input.trim() || !messageSettings.isValid}
-            className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? 'Sending…' : 'Send'}
-          </button>
-        </form>
+          <ImagePreviews images={images} onChange={setImages} />
+          <form onSubmit={handleSubmit} className="mt-2 flex gap-2">
+            <ImagePickerButton images={images} onChange={setImages} disabled={loading} />
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask a question…"
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={loading || !input.trim() || !messageSettings.isValid}
+              className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? 'Sending…' : 'Send'}
+            </button>
+          </form>
+        </div>
       </main>
 
       {responseOpen && (
