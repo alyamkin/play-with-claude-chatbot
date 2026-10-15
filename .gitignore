@@ -2,7 +2,7 @@ node_modules/
 dist/
 build/
 
-# environment - real values never get commited
+# environment - real values never get committed
 .env
 .env.local
 .env.*.local

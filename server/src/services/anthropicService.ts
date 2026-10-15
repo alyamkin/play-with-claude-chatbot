@@ -92,7 +92,6 @@ export async function sendMessage(
   const userTurn = createUserTurn(text, images)
   const payload = createPayload([...getHistory(conversationId), userTurn], resolveConfig(config))
   const message = await client.messages.create(payload)
-  const stream = client.messages.stream(payload)
 
   // Save only after success, and keep every block so tool_use blocks can be sent back later.
   // The API rejects an empty assistant turn, so skip the whole exchange if there's no content.

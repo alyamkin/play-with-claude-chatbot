@@ -10,8 +10,5 @@ export const env = {
   get isProduction() {
     return this.nodeEnv === 'production'
   },
-  // Swap to `required('DATABASE_URL')` once you add a database —
-  // then a missing value crashes at boot instead of at 3am.
-  databaseUrl: process.env.DATABASE_URL,
   anthropicApiKey: required('ANTHROPIC_API_KEY'),
 } as const

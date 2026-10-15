@@ -8,7 +8,7 @@ const app = express()
 // The 100kb default is too small for base64 images.
 app.use(express.json({ limit: '20mb' }))
 
-// 2. The API, all under one prefix. Matches the Vite proxy in step 9.
+// 2. The API, all under one prefix. Matches the Vite proxy in client/vite.config.ts.
 app.use('/api', routes)
 
 // 3. Nothing matched.
