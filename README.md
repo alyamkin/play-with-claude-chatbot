@@ -9,6 +9,7 @@ A multi-turn chat with Claude, built on the [Anthropic Messages API](https://doc
 - **Per-message settings.** Pick the model and set `max_tokens`, stop sequences and `temperature` in a settings drawer. The temperature field only appears for models that accept it.
 - **Copy responses.** Each answer has a copy button that puts its text on the clipboard.
 - **Response history drawer.** Every turn in the conversation is listed with its model, stop reason and token usage. Expand a row, or click an answer in the chat, to inspect its full raw API `Message`.
+- **Responsive layout.** On wide screens the drawers sit beside the chat. Below 1024px they open one at a time over the chat, and the responses drawer fills the screen on phones.
 - **Server-side validation.** Every setting is checked before it reaches the API, and errors come back as clear 400s.
 
 ## Tech stack

@@ -22,8 +22,9 @@ export function SettingsDrawer({
   temperatureError,
   onClose,
 }: Props) {
+  // Below lg it overlays the chat from the left; from lg up it sits beside it
   return (
-    <aside className="flex w-72 shrink-0 flex-col gap-6 border-r border-gray-200 bg-white p-4">
+    <aside className="fixed inset-y-0 left-0 z-30 flex w-72 max-w-[85vw] shrink-0 flex-col gap-6 overflow-y-auto border-r border-gray-200 bg-white p-4 shadow-xl lg:static lg:z-auto lg:max-w-none lg:shadow-none">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">Message settings</h2>
         <button
