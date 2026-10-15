@@ -4,7 +4,12 @@ import type { MessageSettings } from './useMessageSettings'
 import type { ImageInput } from './images'
 
 // Subset of the Anthropic Message object returned by the server
-type MessageResponse = { content: { type: string; text?: string }[] }
+export type MessageResponse = {
+  model: string
+  stop_reason: string | null
+  usage: { input_tokens: number; output_tokens: number }
+  content: { type: string; text?: string }[]
+}
 
 export type ChatEntry = {
   id: string
@@ -21,13 +26,20 @@ export function useChat() {
   // The server keeps the history for this id and sends it with every request
   const [conversationId, setConversationId] = useState(() => crypto.randomUUID())
 
-  async function ask(
+  // Returns the new entry's id right away; the response fills it in later
+  function ask(question: string, images: ImageInput[], settings: MessageSettings) {
+    const id = crypto.randomUUID()
+    setEntries((prev) => [...prev, { id, question, images }])
+    void send(id, question, images, settings)
+    return id
+  }
+
+  async function send(
+    id: string,
     question: string,
     images: ImageInput[],
     { model, maxTokens, stopSequences, temperature }: MessageSettings,
   ) {
-    const id = crypto.randomUUID()
-    setEntries((prev) => [...prev, { id, question, images }])
     setLoading(true)
     try {
       const res = await api.post<MessageResponse>('/anthropic/messages', {

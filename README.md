@@ -8,7 +8,7 @@ A multi-turn chat with Claude, built on the [Anthropic Messages API](https://doc
 - **Image input.** Attach JPEG, PNG, GIF or WebP images to a message. They're sent to Claude as base64 image blocks.
 - **Per-message settings.** Pick the model and set `max_tokens`, stop sequences and `temperature` in a settings drawer. The temperature field only appears for models that accept it.
 - **Copy responses.** Each answer has a copy button that puts its text on the clipboard.
-- **Raw response viewer.** Inspect the full API `Message` (content blocks, stop reason, token usage) for any answer.
+- **Response history drawer.** Every turn in the conversation is listed with its model, stop reason and token usage. Expand a row, or click an answer in the chat, to inspect its full raw API `Message`.
 - **Server-side validation.** Every setting is checked before it reaches the API, and errors come back as clear 400s.
 
 ## Tech stack

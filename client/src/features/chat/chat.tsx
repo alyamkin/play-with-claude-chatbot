@@ -16,8 +16,8 @@ export function Chat() {
   const messageSettings = useMessageSettings()
   const [settingsOpen, setSettingsOpen] = useState(true)
   const [responseOpen, setResponseOpen] = useState(true)
-  // null = follow the latest response
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  // The entry expanded in the response drawer (null = all collapsed)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [images, setImages] = useState<ImageInput[]>([])
 
@@ -27,13 +27,8 @@ export function Chat() {
     if (!question || loading || !messageSettings.isValid) return
     setInput('')
     setImages([])
-    setSelectedId(null)
-    void ask(question, images, messageSettings.settings)
+    setExpandedId(ask(question, images, messageSettings.settings))
   }
-
-  const viewed = selectedId
-    ? entries.find((e) => e.id === selectedId)
-    : entries.findLast((e) => e.response)
 
   return (
     <div className="flex h-screen">
@@ -60,7 +55,7 @@ export function Chat() {
               type="button"
               onClick={() => {
                 newChat()
-                setSelectedId(null)
+                setExpandedId(null)
               }}
               disabled={loading || entries.length === 0}
               className="ml-auto rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
@@ -105,12 +100,12 @@ export function Chat() {
                     <button
                       type="button"
                       onClick={() => {
-                        setSelectedId(entry.id)
+                        setExpandedId(entry.id)
                         setResponseOpen(true)
                       }}
                       title="Show raw response"
                       className={`${answerClass} block text-left ${
-                        viewed?.id === entry.id
+                        expandedId === entry.id
                           ? 'ring-2 ring-blue-300'
                           : 'hover:ring-2 hover:ring-gray-200'
                       }`}
@@ -155,7 +150,12 @@ export function Chat() {
       </main>
 
       {responseOpen && (
-        <ResponseDrawer response={viewed?.response} onClose={() => setResponseOpen(false)} />
+        <ResponseDrawer
+          entries={entries}
+          expandedId={expandedId}
+          onToggle={(id) => setExpandedId((prev) => (prev === id ? null : id))}
+          onClose={() => setResponseOpen(false)}
+        />
       )}
     </div>
   )
