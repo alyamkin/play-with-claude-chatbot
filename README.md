@@ -2,6 +2,8 @@
 
 A multi-turn chat with Claude, built on the [Anthropic Messages API](https://docs.anthropic.com/en/api/messages). It has a React frontend and an Express + TypeScript backend.
 
+![Screenshot of the chat UI](docs/images/screenshot.png)
+
 ## Features
 
 - **Multi-turn conversations.** The server keeps each conversation's history, and "New chat" starts a fresh one.
